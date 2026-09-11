@@ -19,4 +19,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findOverlapping(@Param("roomId") Long roomId,
                                   @Param("startDate") LocalDate startDate,
                                   @Param("endDate") LocalDate endDate);
+
+    // Lấy phiếu đặt của một user cụ thể
+    List<Booking> findByUserId(Long userId);
 }

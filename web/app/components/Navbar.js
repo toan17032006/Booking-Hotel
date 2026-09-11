@@ -15,11 +15,6 @@ import {
 } from "lucide-react";
 import { getUser, clearAuth } from "@/lib/auth";
 
-const links = [
-  { href: "/", label: "Trang chủ", icon: Home },
-  { href: "/bookings", label: "Phiếu đặt", icon: CalendarCheck },
-];
-
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -43,10 +38,12 @@ export default function Navbar() {
     router.push("/");
   };
 
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <Link href="/" className="navbar-brand">
+        <Link href={isAdmin ? "/admin" : "/"} className="navbar-brand">
           <span className="brand-icon" aria-hidden="true">
             <Hotel size={20} strokeWidth={2.4} />
           </span>
@@ -54,30 +51,12 @@ export default function Navbar() {
         </Link>
         <nav className="navbar-nav">
           <ul className="navbar-links">
-            {links.map((l) => {
-              const active = pathname === l.href;
-              const Icon = l.icon;
-              return (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className={`nav-link${active ? " active" : ""}`}
-                  >
-                    <span className="nav-icon" aria-hidden="true">
-                      <Icon size={16} strokeWidth={2.2} />
-                    </span>
-                    <span className="nav-label">{l.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-            {user && user.role === "ADMIN" && (
+            {isAdmin ? (
+              /* ADMIN: chỉ thấy link Quản trị */
               <li>
                 <Link
                   href="/admin"
-                  className={`nav-link nav-link-admin${
-                    pathname === "/admin" ? " active" : ""
-                  }`}
+                  className={`nav-link nav-link-admin${pathname === "/admin" ? " active" : ""}`}
                 >
                   <span className="nav-icon" aria-hidden="true">
                     <ShieldCheck size={16} strokeWidth={2.2} />
@@ -85,6 +64,34 @@ export default function Navbar() {
                   <span className="nav-label">Quản trị</span>
                 </Link>
               </li>
+            ) : (
+              /* CUSTOMER / chưa login: Trang chủ + Phiếu đặt của tôi */
+              <>
+                <li>
+                  <Link
+                    href="/"
+                    className={`nav-link${pathname === "/" ? " active" : ""}`}
+                  >
+                    <span className="nav-icon" aria-hidden="true">
+                      <Home size={16} strokeWidth={2.2} />
+                    </span>
+                    <span className="nav-label">Trang chủ</span>
+                  </Link>
+                </li>
+                {user && (
+                  <li>
+                    <Link
+                      href="/bookings"
+                      className={`nav-link${pathname === "/bookings" ? " active" : ""}`}
+                    >
+                      <span className="nav-icon" aria-hidden="true">
+                        <CalendarCheck size={16} strokeWidth={2.2} />
+                      </span>
+                      <span className="nav-label">Phiếu đặt của tôi</span>
+                    </Link>
+                  </li>
+                )}
+              </>
             )}
           </ul>
 
@@ -124,3 +131,5 @@ export default function Navbar() {
     </header>
   );
 }
+
+

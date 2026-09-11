@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BedDouble,
   CalendarRange,
@@ -142,8 +143,16 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [toasts, setToasts] = useState([]);
 
+  const router = useRouter();
+
   useEffect(() => {
-    const sync = () => setUser(isAuthed() ? getUser() : null);
+    const sync = () => {
+      const u = isAuthed() ? getUser() : null;
+      setUser(u);
+      if (u?.role === 'ADMIN') {
+        router.replace('/admin');
+      }
+    };
     sync();
     window.addEventListener("storage", sync);
     window.addEventListener("authchange", sync);
@@ -151,7 +160,7 @@ export default function Home() {
       window.removeEventListener("storage", sync);
       window.removeEventListener("authchange", sync);
     };
-  }, []);
+  }, [router]);
 
   const userId = user?.userId ?? null;
 
